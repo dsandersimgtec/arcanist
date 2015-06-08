@@ -53,6 +53,10 @@ EOTEXT
           'Show the command which would be issued, but do not actually '.
           'commit anything.'),
       ),
+      'edit' => array(
+        'help' =>
+          "Edit the commit message interactively before commit."
+      ),
       'revision' => array(
         'param' => 'revision_id',
         'help' => pht(
@@ -120,6 +124,16 @@ EOTEXT
         'revision_id' => $revision_id,
         'edit'        => false,
       ));
+
+    $should_edit = $this->getArgument('edit');
+    if ($should_edit) {
+      $edited = $this->newInteractiveEditor($message)
+              ->setName('differential-edit-revision-info')
+              ->editInteractively();
+      if ($edited != $message) {
+        $message = $edited;
+      }
+    }
 
     $event = $this->dispatchEvent(
       ArcanistEventType::TYPE_COMMIT_WILLCOMMITSVN,
